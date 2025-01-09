@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "sourceMap": true,
+        "noEmitOnError": true,
+        "noImplicitAny": true,
+        "strict": true,
+        "outDir": "./js",
+        "rootDir": "./ts",
+    },
+    "include": [
+        "./ts/**/*.ts"
+    ], // Incluye todos los archivos .ts dentro de la carpeta ts/
+    "exclude": [
+        "node_modules"
+    ]
+}
