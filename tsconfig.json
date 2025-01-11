@@ -10,7 +10,7 @@
     },
     "include": [
         "./ts/**/*.ts"
-    ], // Incluye todos los archivos .ts dentro de la carpeta ts/
+, "js/Touch.js"    ], // Incluye todos los archivos .ts dentro de la carpeta ts/
     "exclude": [
         "node_modules"
     ]
