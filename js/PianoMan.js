@@ -104,10 +104,12 @@ function gameInit() {
  */
 function activarTecla(key, note) {
     const keyElement = $('#' + key);
-    keyElement.toggleClass('activa');
-    setTimeout(() => {
-        keyElement.toggleClass('activa', false);
-    }, 500);
+    if (!$('#pianoTile')) {
+        keyElement.toggleClass('activa');
+        setTimeout(() => {
+            keyElement.toggleClass('activa', false);
+        }, 500);
+    }
     playSound(note);
 }
 /**
@@ -137,7 +139,9 @@ function generatePianoTiles(svgElement, notes) {
      */
     function createNoteElement(note, y) {
         const rect = document.createElementNS(svgNS, "rect");
-        rect.setAttribute("id", "nota");
+        rect.setAttribute("class", "nota");
+        rect.setAttribute("id", `${note}`);
+        rect.setAttribute("data-key", getnoteKey(note));
         rect.setAttribute("x", getXPosition(note));
         rect.setAttribute("y", y.toString());
         rect.setAttribute("width", "45");
@@ -169,6 +173,25 @@ function generatePianoTiles(svgElement, notes) {
         };
         return positions[note]?.toString() || "0";
     }
+    function getnoteKey(note) {
+        const keys = {
+            "do": 'KeyA',
+            "re": 'KeyS',
+            "mi": 'KeyD',
+            "fa": 'KeyF',
+            "sol": 'KeyG',
+            "la": 'KeyH',
+            "si": 'KeyJ',
+            "do2": 'KeyR',
+            "re2": 'KeyT',
+            "mi2": 'KeyY',
+            "fa2": 'KeyU',
+            "sol2": 'KeyI',
+            "la2": 'KeyO',
+            "si2": 'KeyP',
+        };
+        return keys[note]?.toString() || "";
+    }
     // Agregar cada nota al SVG en el tiempo indicado
     notes.forEach(({ note, time }) => {
         setTimeout(() => {
@@ -188,12 +211,16 @@ function generatePianoTiles(svgElement, notes) {
      * @param {SVGRectElement} noteElement - Element <rect> de la nota a animar.
      */
     function animateNote(noteElement) {
-        let y = -20;
+        let frontera = document.getElementById("frontera").getBoundingClientRect();
+        let y = 0;
         const interval = setInterval(() => {
             y += 2; // Incremento de la posición Y
             noteElement.setAttribute("y", y.toString());
             // Si la nota sale del área visible, la eliminamos
-            if (y > svgElement.clientHeight) {
+            if (y > frontera.top - frontera.height) {
+                checkKey(noteElement);
+            }
+            if (y > svgElement.clientHeight - frontera.height) {
                 svgElement.removeChild(noteElement);
                 clearInterval(interval);
             }
@@ -201,12 +228,15 @@ function generatePianoTiles(svgElement, notes) {
     }
 }
 // Funcion para comprobar si el usuario le ha dado a las teclas correctas
-function checkKey(svgElement, notes) {
-    const piano = document.getElementById("piano").getBoundingClientRect();
-    $("rect[id^='nota']").each((i, e) => {
-        if (!e.parentNode)
-            return; // Saltar si la nota no existe
-        const notaRec = e.getBoundingClientRect();
+function checkKey(noteElement) {
+    console.log(noteElement.getAttribute('data-key'));
+    $('body').on('keydown', (event) => {
+        if (event.code === noteElement.getAttribute('data-key')) {
+            $(`#${noteElement.getAttribute('data-key')}`).addClass('correct');
+            // setTimeout(() => {
+            // 	$(`#${noteElement.getAttribute('data-key')}`).removeClass('correct');
+            // }, );
+        }
     });
 }
 // estetico

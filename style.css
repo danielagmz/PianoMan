@@ -215,6 +215,17 @@ text.white {
     fill: #a0a0a0;
 }
 
+#frontera {
+    fill: cadetblue;
+    stroke: transparent;
+    stroke-width: 0;
+}
+
+.correct {
+    transition-duration: 0.1s;
+    fill: #58f5c9;
+}
+
 .wrong {
     transition-duration: 0.1s;
     fill: #ed6161;
