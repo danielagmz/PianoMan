@@ -35,7 +35,7 @@ function init() {
     backButton();
 }
 /**
- * Event listener per al bot  "Atras" per tornar al menu  principal
+ * Event listener per al boto  "Atras" per tornar al menu  principal
  */
 function backButton() {
     $('#back').on('click', () => {
@@ -104,12 +104,10 @@ function gameInit() {
  */
 function activarTecla(key, note) {
     const keyElement = $('#' + key);
-    if (!$('#pianoTile')) {
-        keyElement.toggleClass('activa');
-        setTimeout(() => {
-            keyElement.toggleClass('activa', false);
-        }, 500);
-    }
+    keyElement.toggleClass('activa');
+    setTimeout(() => {
+        keyElement.toggleClass('activa', false);
+    }, 500);
     playSound(note);
 }
 /**
@@ -217,27 +215,12 @@ function generatePianoTiles(svgElement, notes) {
             y += 2; // Incremento de la posición Y
             noteElement.setAttribute("y", y.toString());
             // Si la nota sale del área visible, la eliminamos
-            if (y > frontera.top - frontera.height) {
-                checkKey(noteElement);
-            }
             if (y > svgElement.clientHeight - frontera.height) {
                 svgElement.removeChild(noteElement);
                 clearInterval(interval);
             }
         }, 16);
     }
-}
-// Funcion para comprobar si el usuario le ha dado a las teclas correctas
-function checkKey(noteElement) {
-    console.log(noteElement.getAttribute('data-key'));
-    $('body').on('keydown', (event) => {
-        if (event.code === noteElement.getAttribute('data-key')) {
-            $(`#${noteElement.getAttribute('data-key')}`).addClass('correct');
-            // setTimeout(() => {
-            // 	$(`#${noteElement.getAttribute('data-key')}`).removeClass('correct');
-            // }, );
-        }
-    });
 }
 // estetico
 /**
