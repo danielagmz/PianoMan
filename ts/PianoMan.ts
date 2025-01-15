@@ -25,14 +25,24 @@ function init() {
 	$('#freeStyle').on('click', () => {
 		$('#menu').hide();
 		$('#piano').show();
+		$('#back').show();
 		gameInit();
+
 	})
 
 	$('#song').on('click', () => {
 		$('#menu').hide();
 		$('#songList').show();
+		$('#back').show();
 		selectSong();
 	})
+	backButton();
+}
+
+function backButton(){
+	$('#back').on('click', () => {
+		location.reload();
+	});
 }
 
 function selectSong() {
