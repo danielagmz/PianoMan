@@ -14,6 +14,11 @@ const keyMap = {
     'KeyE': 'KeyJ'
 };
 let teclasActivas = {};
+/**
+ * Inicialitza els esdeveniments dels botons "Lliure" i "Canço"
+ * Mostra o amaga els elements HTML corresponents
+ * Crida les funcions selectSong() segons el cas i gameInit() per a iniciar el piano
+ */
 function init() {
     $('#freeStyle').on('click', () => {
         $('#menu').hide();
@@ -29,11 +34,20 @@ function init() {
     });
     backButton();
 }
+/**
+ * Event listener per al bot  "Atras" per tornar al menu  principal
+ */
 function backButton() {
     $('#back').on('click', () => {
         location.reload();
     });
 }
+/**
+ * Mostra el menu de cançons
+ * Amaga el llistat de cançons i mostra el piano quan es seleciona una
+ * Crida la funcio  gameInit() per a iniciar el piano i
+ * generatePianoTiles() per a mostrar els canals de notes
+ */
 function selectSong() {
     $('#corderito').on('click', () => {
         $('#songList').hide();
@@ -44,12 +58,20 @@ function selectSong() {
         generatePianoTiles(svg, notes);
     });
 }
+/**
+ * Inicialitza el joc
+ * Afegeix esdeveniments per a que quan es premi una tecla, es cridi la funcio  activarTecla()
+ * amb el codi de la tecla i la nota corresponent
+ * Tambe  desactiva el menu  contextual
+ */
 function gameInit() {
     //TouchEmulator();
+    // cuando se presiona una tecla se agrega la tecla al array y en caso de que ya este no hace nada
     $(document).on('keydown', (event) => {
         if (teclasActivas[event.code])
             return;
         teclasActivas[event.code] = true;
+        // si ha pulsado la tecla auxiliar pone la clase activa a la tecla y el sonido correspondiente
         const index = notas[0].indexOf(keyMap[event.code]);
         if (index !== -1) {
             activarTecla(keyMap[event.code], notas[1][index]);
@@ -75,6 +97,11 @@ function gameInit() {
         event.preventDefault();
     });
 }
+/**
+ * Activa la tecla i el seu so. Afegeix la classe "activa" a la tecla i la treu al cap de 500ms.
+ * @param {string} key - Identificador de la tecla.
+ * @param {string} note - Nom de la nota de so corresponent.
+ */
 function activarTecla(key, note) {
     const keyElement = $('#' + key);
     keyElement.toggleClass('activa');
@@ -83,25 +110,46 @@ function activarTecla(key, note) {
     }, 500);
     playSound(note);
 }
+/**
+ * Reprodueix el so de la nota amb la clau key.
+ * @param {string} key - Clau de la nota.
+ */
 function playSound(key) {
     const sound = new Audio(`assets/${key}.mp3`);
     sound.play();
 }
-// Función para generar las notas dentro del SVG
+/**
+ * Genera las notas del piano en el elemento SVG con el id pasado.
+ * Crea un elemento "rect" por cada nota y lo agrega al elemento SVG.
+ * El elemento "rect" tiene la clase "nota" y se le asigna una posición X
+ * y una posición Y de -20 para que aparezca por encima de los canales del piano.
+ * La nota se anima para que descienda y se elimina cuando sale del área visible.
+ * @param {SVGSVGElement} svgElement - Elemento SVG donde se dibujarán las notas.
+ * @param {Note[]} notes - Array de objetos con la estructura { note: string, time: number }
+ */
 function generatePianoTiles(svgElement, notes) {
-    const svgNS = "http://www.w3.org/2000/svg"; // Namespace SVG
-    // Función para crear una nota
+    const svgNS = "http://www.w3.org/2000/svg";
+    /**
+     * Crea un elemento "rect" para una nota en el piano.
+     * @param {string} note - Nota (do, re, mi, ...)
+     * @param {number} y - Posición Y de la nota
+     * @returns {SVGRectElement} Elemento "rect" creado
+     */
     function createNoteElement(note, y) {
         const rect = document.createElementNS(svgNS, "rect");
-        rect.setAttribute("id", "nota"); // Identificador de la nota
-        rect.setAttribute("x", getXPosition(note)); // Obtener posición X según la nota
-        rect.setAttribute("y", y.toString()); // Posición inicial en Y
-        rect.setAttribute("width", "45"); // Ancho del rectángulo
-        rect.setAttribute("height", "20"); // Altura del rectángulo
-        rect.setAttribute("fill", "yellow"); // Color de la nota
+        rect.setAttribute("id", "nota");
+        rect.setAttribute("x", getXPosition(note));
+        rect.setAttribute("y", y.toString());
+        rect.setAttribute("width", "45");
+        rect.setAttribute("height", "20");
+        rect.setAttribute("fill", "yellow");
         return rect;
     }
-    // Mapeo de notas a posiciones X
+    /**
+     * Convierte una nota en su posición X en el piano.
+     * @param {string} note - Nota (do, re, mi, ...)
+     * @returns {string} Posición X de la nota en formato string. Si la nota no existe, devuelve "0".
+     */
     function getXPosition(note) {
         const positions = {
             "do": 0,
@@ -124,13 +172,21 @@ function generatePianoTiles(svgElement, notes) {
     // Agregar cada nota al SVG en el tiempo indicado
     notes.forEach(({ note, time }) => {
         setTimeout(() => {
-            const noteElement = createNoteElement(note, -20); // Y inicial es -20 para que aparezca por encima del piano
+            const noteElement = createNoteElement(note, -20); // Y inicial es -20 para que aparezca por encima de los canales del piano
             svgElement.appendChild(noteElement);
             // Animar la nota para que descienda
             animateNote(noteElement);
         }, time);
     });
-    // Función para animar las notas hacia abajo
+    /**
+     * Animar una nota para que descienda.
+     *
+     * La funció crea un interval que cada 16 milisegons
+     * fa que la nota baixi 2 píxels en la seva posició Y.
+     *
+     * Si la nota surt de l'àrea visible, se l'elimina del SVG.
+     * @param {SVGRectElement} noteElement - Element <rect> de la nota a animar.
+     */
     function animateNote(noteElement) {
         let y = -20;
         const interval = setInterval(() => {
